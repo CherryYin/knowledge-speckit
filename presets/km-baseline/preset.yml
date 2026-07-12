@@ -1,0 +1,67 @@
+schema_version: "1.0"
+
+preset:
+  id: "km-baseline"
+  name: "Knowledge Management Baseline"
+  version: "1.1.0"
+  description: "Guardrails for spec-driven development in a knowledge management system — sources, notes, memory, wiki, retrieval, and agent workflows"
+  author: "knowledge-speckit"
+  license: "MIT"
+
+requires:
+  speckit_version: ">=0.8.5"
+
+provides:
+  templates:
+    - type: "command"
+      name: "speckit.specify"
+      file: "commands/speckit.specify.md"
+      description: "KM specify guardrails — knowledge domain, pipeline risk scan, provenance"
+      strategy: "prepend"
+
+    - type: "command"
+      name: "speckit.clarify"
+      file: "commands/speckit.clarify.md"
+      description: "KM clarify guardrails — ambiguity taxonomy for knowledge pipelines"
+      strategy: "prepend"
+
+    - type: "command"
+      name: "speckit.plan"
+      file: "commands/speckit.plan.md"
+      description: "KM plan guardrails — schema, retrieval, agent safety, reuse"
+      strategy: "prepend"
+
+    - type: "command"
+      name: "speckit.tasks"
+      file: "commands/speckit.tasks.md"
+      description: "KM tasks guardrails — pipeline, schema, retrieval, agent task coverage"
+      strategy: "prepend"
+
+    - type: "command"
+      name: "speckit.implement"
+      file: "commands/speckit.implement.md"
+      description: "KM implement guardrails — provenance, migration, agent safety enforcement"
+      strategy: "prepend"
+
+    - type: "command"
+      name: "speckit.constitution"
+      file: "commands/speckit.constitution.md"
+      description: "KM constitution guardrails — knowledge-first, provenance, retrieval quality"
+      strategy: "prepend"
+
+    - type: "command"
+      name: "speckit.checklist"
+      file: "commands/speckit.checklist.md"
+      description: "KM checklist guardrails — KM requirement quality validation categories"
+      strategy: "prepend"
+
+    - type: "command"
+      name: "speckit.analyze"
+      file: "commands/speckit.analyze.md"
+      description: "KM analyze guardrails — cross-artifact provenance/schema/retrieval/agent alignment"
+      strategy: "prepend"
+
+tags:
+  - "knowledge-management"
+  - "guardrails"
+  - "pipeline"
