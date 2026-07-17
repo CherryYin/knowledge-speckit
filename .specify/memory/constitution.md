@@ -1,14 +1,20 @@
 <!--
 Sync Impact Report
-- Version change: 0.1.0 -> 1.0.0
-- Modified principles: none (initial KM constitution from template)
-- Added sections: Core Principles (8), Governance
+- Version change: 1.0.0 -> 1.1.0
+- Modified principles: none
+- Added sections:
+  - Principle 9: Async-First, Avoid Direct asyncio
+  - Principle 10: Log Errors, Do Not Raise
+  - Principle 11: On-Demand & Slim Dependencies
 - Removed sections: none
+- Bump rationale: MINOR - three new engineering principles added (materially expanded guidance).
 - Templates requiring updates:
-  - ✅ `.specify/templates/spec-template.md` (reviewed; no changes required)
-  - ✅ `.specify/templates/plan-template.md` (reviewed; no changes required)
-  - ✅ `.specify/templates/tasks-template.md` (reviewed; no changes required)
-  - ✅ `.specify/templates/checklist-template.md` (reviewed; no changes required)
+  - `.specify/templates/spec-template.md` (reviewed; no changes required - references constitution dynamically)
+  - `.specify/templates/plan-template.md` (reviewed; no changes required - Constitution Check gates are constitution-driven)
+  - `.specify/templates/tasks-template.md` (reviewed; no changes required - task phases generic)
+  - `.specify/templates/checklist-template.md` (reviewed; no changes required)
+- Runtime docs:
+  - `README.md` (reviewed; "8 KM principles" describes the preset KM guardrail identity, unchanged. The 3 new principles are project-level engineering conventions added to the live constitution.)
 - Follow-up TODOs:
   - Quality commands: DEFERRED: exact repo commands not confirmed / owner: user / when: before merge-gated CI is enabled
   - Release, rollback, and observability expectations: DEFERRED: not defined yet / owner: user / when: before first production release
@@ -124,6 +130,50 @@ Agent tools MUST NOT bypass provenance recording, schema validation, or retrieva
 indexing. Any knowledge written by an agent MUST go through the same storage and
 indexing pipeline as user-written knowledge.
 
+### 9. Async-First, Avoid Direct asyncio
+Prefer writing concurrency as async functions (`async def` / `await`) and let the
+host framework manage the event loop. Code MUST NOT reach into the `asyncio`
+library low-level primitives (`asyncio.run`, `asyncio.get_event_loop`,
+`asyncio.create_task`, loop/transport/protocol APIs) when a higher-level
+alternative exists.
+
+When concurrency primitives are needed, prefer portable async abstractions (e.g.,
+`anyio`) over asyncio-specific code so async logic stays runtime-agnostic and
+testable. Direct asyncio usage MUST be justified in the plan.
+
+Rationale: coupling to asyncio locks code to a single event-loop implementation,
+complicates testing, and blocks portability across async runtimes (asyncio/trio).
+
+### 10. Log Errors, Do Not Raise
+Operational and recoverable errors SHOULD be recorded via structured logging and
+handled in place (return a degraded result, skip the item, continue the pipeline)
+rather than raised as exceptions that propagate and halt execution. Logged errors
+MUST include enough context (operation, relevant inputs, error type) to be
+diagnosed.
+
+Exceptions MAY be raised only for programmer errors, invariant violations, and
+public API contract validation; even then, the error MUST be logged at the
+boundary before being surfaced. Long-running pipelines and agent workflows MUST
+NOT crash on a single item's failure.
+
+Rationale: resilience-first logging keeps knowledge pipelines and agents running
+through partial failures; a raised exception in a hot path turns one bad record
+into a full outage.
+
+### 11. On-Demand & Slim Dependencies
+Dependencies MUST be added only when actually needed (on-demand), never
+speculatively. When a slim or narrower-scope variant of a package satisfies real
+usage, the slim/scoped variant MUST be preferred over the full package - for
+example `fastapi-slim` over `fastapi`, or an extras-scoped install over a
+meta-package.
+
+Choosing a heavy/full package where a slim variant would suffice MUST be
+justified in the plan. Dependency additions MUST be reviewed for transitive
+footprint, supply-chain risk, and maintenance burden.
+
+Rationale: minimal dependencies reduce install time, attack surface,
+supply-chain risk, and long-term maintenance cost.
+
 ## Governance
 
 This constitution supersedes all other practices within this repository. Amendments
@@ -133,4 +183,4 @@ All specs, plans, and code reviews MUST verify compliance with these principles.
 Conflicts between a spec and the constitution MUST be resolved before planning
 proceeds.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-11 | **Last Amended**: 2026-07-11
+**Version**: 1.1.0 | **Ratified**: 2026-07-11 | **Last Amended**: 2026-07-16
